@@ -1,619 +1,658 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dlais - Bio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dlais</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0e0e0e;
+  --border: rgba(255,255,255,0.055);
+  --border-h: rgba(255,255,255,0.11);
+  --t1: #efefef;
+  --t2: #555;
+  --t3: #2a2a2a;
+  --mono: 'DM Mono', monospace;
+  --serif: 'DM Serif Display', serif;
+}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #060608;
-            color: #e4e4e7;
-            overflow-x: hidden;
-        }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { cursor:none; }
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(74, 160, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(20, 50, 90, 0.4) 0%, transparent 50%),
-                radial-gradient(ellipse at 20% 60%, rgba(10, 30, 60, 0.3) 0%, transparent 50%);
-        }
+.grain {
+  position: fixed; inset: 0; z-index: 200; pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
 
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            background-image: radial-gradient(rgba(74, 160, 255, 0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
+.vignette {
+  position: fixed; inset: 0; z-index: 199; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.7) 100%);
+}
 
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
+/* ── PAGE ── */
+.page {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 0 40px 180px;
+}
 
-        .gradient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            animation: float 20s ease-in-out infinite;
-        }
+/* ── HERO ── */
+.hero {
+  padding: 80px 0 64px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  opacity: 0;
+  animation: up 1s cubic-bezier(.16,1,.3,1) .05s forwards;
+}
 
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(74, 160, 255, 0.8) 0%, transparent 70%);
-            top: -200px;
-            left: -200px;
-        }
+.hero-left { display:flex; align-items:flex-end; gap:28px; }
 
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(60, 130, 220, 0.6) 0%, transparent 70%);
-            top: 50%;
-            right: -200px;
-            animation-delay: 5s;
-        }
+.avatar-wrap { position:relative; width:96px; height:96px; flex-shrink:0; }
 
-        .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(40, 100, 200, 0.5) 0%, transparent 70%);
-            bottom: -150px;
-            left: 50%;
-            animation-delay: 10s;
-        }
+.avatar-img {
+  width:100%; height:100%;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.05);
+  transition: filter .8s ease;
+  border: 1px solid var(--border);
+  display: block;
+}
+.avatar-img:hover { filter: grayscale(0%) contrast(1); }
 
-        @keyframes float {
+.avatar-fallback {
+  width:100%; height:100%; border-radius:50%;
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--serif); font-size:32px; color:var(--t2);
+  background: var(--surface);
+}
 
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
+.hero-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(56px, 9vw, 96px);
+  line-height: 0.88;
+  letter-spacing: -3px;
+  color: var(--t1);
+}
 
-            33% {
-                transform: translate(50px, -50px) scale(1.1);
-            }
+.hero-right {
+  text-align: right;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
 
-            66% {
-                transform: translate(-50px, 50px) scale(0.9);
-            }
-        }
+.hero-tagline {
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 2;
+}
 
-        .glass-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(74, 160, 255, 0.08);
-            border-radius: 6px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-        }
+.hero-meta {
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
 
-        .avatar-container {
-            position: relative;
-            width: 140px;
-            height: 140px;
-        }
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0;
+  margin-top: 0;
+}
 
-        .avatar-img {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            z-index: 1;
-            border: 2px solid rgba(74, 160, 255, 0.25);
-            box-shadow: 0 0 0 1px rgba(74, 160, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.6);
-            transition: border-color 0.3s ease;
-        }
+/* left column */
+.col-left {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
 
-        .avatar-img:hover {
-            border-color: rgba(74, 160, 255, 0.45);
-        }
+/* right column */
+.col-right {
+  display: flex;
+  flex-direction: column;
+}
 
-        .floating-3d {
-            animation: floating3d 6s ease-in-out infinite;
-            transform-style: preserve-3d;
-        }
+.panel {
+  padding: 32px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background .25s;
+}
+.panel:last-child { border-bottom: none; }
+.col-left .panel { border-bottom: 1px solid var(--border); }
 
-        @keyframes floating3d {
+.col-right .panel { border-left: none; }
 
-            0%,
-            100% {
-                transform: translateY(0) rotateX(0) rotateY(0);
-            }
+.panel-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--t3);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-            25% {
-                transform: translateY(-20px) rotateX(5deg) rotateY(5deg);
-            }
+.panel-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 
-            50% {
-                transform: translateY(0) rotateX(0) rotateY(10deg);
-            }
+/* ── INFO ROWS ── */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.info-row:last-child { border-bottom: none; }
+.ik { color: var(--t3); }
+.iv { color: var(--t2); font-weight: 300; }
 
-            75% {
-                transform: translateY(-10px) rotateX(-5deg) rotateY(5deg);
-            }
-        }
+/* ── LINKS ── */
+.lnk {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--t2);
+  font-size: 11px;
+  font-weight: 300;
+  transition: color .2s, padding-left .2s;
+}
+.lnk:last-child { border-bottom: none; }
+.lnk:hover { color: var(--t1); padding-left: 4px; }
+.lnk svg { opacity: .4; flex-shrink: 0; transition: opacity .2s; }
+.lnk:hover svg { opacity: .8; }
+.lnk-arr { margin-left: auto; opacity: .15 !important; transition: opacity .2s, transform .2s !important; }
+.lnk:hover .lnk-arr { opacity: .5 !important; transform: translate(2px,-2px); }
 
-        .text-gradient {
-            background: linear-gradient(135deg, #9ac7ff, #4aa0ff, #2b6eb0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+/* ── SKILLS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  font-size: 9px; letter-spacing: 0.07em;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  color: var(--t3);
+  transition: border-color .2s, color .2s;
+}
+.chip:hover { border-color: var(--border-h); color: var(--t2); }
 
-        .glow-text {
-            text-shadow: 0 0 30px rgba(74, 160, 255, 0.4), 0 0 60px rgba(74, 160, 255, 0.1);
-        }
+/* ── ABOUT ── */
+.about-text {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 2;
+  font-weight: 300;
+  max-width: 520px;
+}
 
-        .section-title {
-            position: relative;
-        }
+/* ── PROJECTS ── */
+.proj {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: padding-left .2s;
+}
+.proj:last-child { border-bottom: none; }
+.proj:hover { padding-left: 4px; }
+.proj-icon {
+  width:30px; height:30px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+.proj:hover .proj-icon { border-color: var(--border-h); }
+.proj-icon svg { opacity: .4; transition: opacity .2s; }
+.proj:hover .proj-icon svg { opacity: .8; }
+.proj-name { font-size: 11px; color: var(--t2); transition: color .2s; font-weight: 300; }
+.proj-sub  { font-size: 9px; color: var(--t3); margin-top: 1px; letter-spacing: .06em; }
+.proj:hover .proj-name { color: var(--t1); }
 
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
+/* ── BIG TEXT PANEL ── */
+.big-panel {
+  padding: 40px 28px;
+  border-bottom: 1px solid var(--border);
+}
+.big-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 72px;
+  color: var(--t3);
+  line-height: 1;
+  letter-spacing: -3px;
+  margin-bottom: 4px;
+}
+.big-label { font-size: 9px; color: var(--t3); letter-spacing: .14em; text-transform: uppercase; }
 
-        .btn-glass:hover {
-            background: rgba(74, 160, 255, 0.06);
-            border-color: rgba(74, 160, 255, 0.15);
-        }
+.stats-row {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.stat {
+  flex: 1;
+  padding: 28px;
+  border-right: 1px solid var(--border);
+  border-left: none;
+}
+.stat:last-child { border-right: none; }
 
-        .skill-tag {
-            background: rgba(74, 160, 255, 0.06);
-            border: 1px solid rgba(74, 160, 255, 0.15);
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
+/* ── STAGGER ── */
+.s { opacity: 0; animation: up .7s cubic-bezier(.16,1,.3,1) forwards; }
+.s1 { animation-delay: .15s; }
+.s2 { animation-delay: .25s; }
+.s3 { animation-delay: .35s; }
+.s4 { animation-delay: .45s; }
 
-        .skill-tag:hover {
-            background: rgba(74, 160, 255, 0.12);
-            border-color: rgba(74, 160, 255, 0.3);
-        }
+@keyframes up {
+  from { opacity:0; transform: translateY(20px); }
+  to   { opacity:1; transform: translateY(0); }
+}
 
-        .project-card {
-            position: relative;
-            overflow: hidden;
-        }
+/* ── PLAYER ── */
+.player {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 210;
+  height: 62px;
+  background: rgba(6,6,6,0.94);
+  backdrop-filter: blur(32px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 40px; gap: 28px;
+}
 
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.6s ease forwards;
-        }
+.pl-track { flex: 1; min-width: 0; }
+.pl-title  { font-size: 11px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 300; }
+.pl-artist { font-size: 9px;  color: var(--t3); letter-spacing: .08em; margin-top: 2px; }
 
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.pl-controls { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.pl-btn {
+  background: none; border: none; color: var(--t3);
+  cursor: none; padding: 4px;
+  display: flex; align-items: center;
+  transition: color .2s;
+}
+.pl-btn:hover { color: var(--t1); }
+.pl-btn.play {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t2);
+  transition: all .2s;
+}
+.pl-btn.play:hover { border-color: var(--border-h); color: var(--t1); }
 
-        .fade-in-up:nth-child(1) {
-            animation-delay: 0.05s;
-        }
+.pl-progress { flex: 2; max-width: 300px; display: flex; flex-direction: column; gap: 5px; }
+.prog-bar {
+  width: 100%; height: 1px;
+  background: var(--border);
+  position: relative; cursor: none;
+}
+.prog-fill { height: 100%; background: var(--t3); width: 0%; transition: background .2s; }
+.prog-bar:hover .prog-fill { background: var(--t2); }
+.prog-times { display: flex; justify-content: space-between; font-size: 9px; color: var(--t3); font-weight: 300; }
 
-        .fade-in-up:nth-child(2) {
-            animation-delay: 0.1s;
-        }
+.pl-tracklist {
+  display: flex; gap: 0; flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.pl-tl-item {
+  padding: 6px 12px;
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: .06em;
+  border-right: 1px solid var(--border);
+  cursor: none;
+  transition: all .2s;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pl-tl-item:last-child { border-right: none; }
+.pl-tl-item:hover { color: var(--t2); background: var(--surface); }
+.pl-tl-item.active { color: var(--t2); background: var(--surface); }
 
-        .fade-in-up:nth-child(3) {
-            animation-delay: 0.15s;
-        }
+/* ── SPLASH ── */
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: none;
+  transition: opacity .8s ease;
+}
+.splash.hide { opacity: 0; pointer-events: none; }
+.splash-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(64px, 14vw, 130px);
+  letter-spacing: -4px;
+  line-height: 1;
+  color: var(--t1);
+  margin-bottom: 32px;
+}
+.splash-hint {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--t3);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:.8} }
 
-        .fade-in-up:nth-child(4) {
-            animation-delay: 0.2s;
-        }
+/* ── CURSOR ── */
+#cur { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
 
-        .fade-in-up:nth-child(5) {
-            animation-delay: 0.25s;
-        }
-
-        .fade-in-up:nth-child(6) {
-            animation-delay: 0.3s;
-        }
-
-        .blue-icon {
-            color: #4aa0ff;
-        }
-
-        .blue-text {
-            color: #4aa0ff;
-        }
-
-        @media (max-width: 768px) {
-            .avatar-container {
-                width: 100px;
-                height: 100px;
-            }
-        }
-    </style>
+@media (max-width: 700px) {
+  .layout { grid-template-columns: 1fr; }
+  .col-left { border-right: none; border-bottom: 1px solid var(--border); }
+  .stats-row { flex-direction: column; }
+  .stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero-right { text-align: left; }
+  .pl-tracklist { display: none; }
+}
+</style>
 </head>
-
 <body>
-    <div class="animated-bg">
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
+
+<div class="splash" id="splash">
+  <div class="splash-name">Dlais</div>
+  <div class="splash-hint">нажми чтобы войти</div>
+</div>
+
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-left">
+      <div class="avatar-wrap">
+        <img
+          src="bee4d7bbbf909f568288abcbe22150a0.jpg"
+          alt="Dlais"
+          class="avatar-img"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+        >
+        <div class="avatar-fallback" style="display:none">D</div>
+      </div>
+      <h1 class="hero-name">Dlais</h1>
     </div>
+    <div class="hero-right">
+      <div class="hero-tagline">majestic love</div>
+      <div class="hero-meta">detroit &nbsp;·&nbsp; +2 мск</div>
+    </div>
+  </header>
 
-    <div class="relative z-10 min-h-screen py-8 px-4">
-        <div class="max-w-6xl mx-auto">
-            <!-- Шапка профиля -->
-            <div class="glass-card p-6 mb-6 fade-in-up floating-3d">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <div class="avatar-container">
-                        <!-- Аватарка: положи файл в ту же папку и укажи его имя. Пример: "bee4d7bbbf909f568288abcbe22150a0.jpg" -->
-                        <img src="bee4d7bbbf909f568288abcbe22150a0.jpg" alt="Dlais avatar" class="avatar-img">
-                    </div>
-                    <div class="flex-1 text-center md:text-left">
-                        <h1 class="text-4xl md:text-5xl font-bold text-gradient mb-2 glow-text">Dlais</h1>
-                        <p class="text-base text-zinc-500 mb-4">я бравл старсер крутой</p>
-                        <div class="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
-                            <span class="px-3 py-1.5 btn-glass text-xs flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 blue-icon" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                14 лет
-                            </span>
-                            <span class="px-3 py-1.5 btn-glass text-xs flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 blue-icon" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                detoit
-                            </span>
-                        </div>
-                        <div class="flex flex-wrap gap-4 text-xs text-zinc-500 justify-center md:justify-start">
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12,6 12,12 16,14"></polyline>
-                                </svg>
-                                <span>Часовой пояс: +2 к мск</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="stats-row s s1">
+    <div class="stat">
+      <div class="big-num">#1033</div>
+      <div class="big-label">orlando</div>
+    </div>
+    <div class="stat">
+      <div class="big-num">02</div>
+      <div class="big-label">лав</div>
+    </div>
+    <div class="stat">
+      <div class="big-num">ru</div>
+      <div class="big-label">язык</div>
+    </div>
+  </div>
 
-            <!-- Три колонки -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <!-- Левая колонка -->
-                <div class="space-y-4">
-                    <!-- Основное -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <polyline points="16,18 22,12 16,6"></polyline>
-                                <polyline points="8,6 2,12 8,18"></polyline>
-                            </svg>
-                            Основное
-                        </h3>
-                        <div class="space-y-2.5 text-xs">
-                            <div class="flex items-center gap-2.5 text-zinc-400">
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>Возраст: 14 лет</span>
-                            </div>
-                            <div class="flex items-center gap-2.5 text-zinc-400">
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Родился в: chicago </span>
-                            </div>
-                            <div class="flex items-center gap-2.5 text-zinc-400">
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Нахожусь в: detroit</span>
-                            </div>
-                            <div class="flex items-center gap-2.5 text-zinc-400">
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12,6 12,12 16,14"></polyline>
-                                </svg>
-                                <span>Часовой пояс: +2 к мск</span>
-                            </div>
-                            <div class="flex items-center gap-2.5 text-zinc-400">
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path d="M5 8l6 6"></path>
-                                    <path d="M4 14l6-6 2-3"></path>
-                                    <path d="M2 5h12"></path>
-                                    <path d="M7 2h1"></path>
-                                    <path d="M22 22l-5-10-5 10"></path>
-                                    <path d="M14 18h6"></path>
-                                </svg>
-                                <span>Русский, английский (чуть-чутьа)</span>
-                            </div>
-                        </div>
-                    </div>
+  <div class="layout s s2">
+    <div class="col-left">
 
-                    <!-- Контакты (только Discord и Telegram) -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            Контакты
-                        </h3>
-                        <div class="space-y-2">
-                            <!-- Discord -->
-                            <a href="https://discord.com/users/1170937765924438096" target="_blank"
-                                class="flex items-center gap-3 p-2.5 rounded btn-glass group">
-                                <div class="w-8 h-8 rounded bg-zinc-800/80 flex items-center justify-center border border-zinc-700/50">
-                                    <svg class="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-sm font-medium text-zinc-300">Discord</div>
-                                    <div class="text-xs text-zinc-600">@dlais</div>
-                                </div>
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="2" />
-                                </svg>
-                            </a>
-                            <!-- Telegram -->
-                            <a href="https://t.me/Dlais_off" target="_blank"
-                                class="flex items-center gap-3 p-2.5 rounded btn-glass group">
-                                <div class="w-8 h-8 rounded bg-zinc-800/80 flex items-center justify-center border border-zinc-700/50">
-                                    <svg class="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-sm font-medium text-zinc-300">Telegram</div>
-                                    <div class="text-xs text-zinc-600">@Dlais_off</div>
-                                </div>
-                                <svg class="w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="2" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
+      <div class="panel">
+        <div class="panel-label">контакты</div>
+        <a href="https://discord.com/users/1170937765924438096" target="_blank" class="lnk">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          @.dlais
+          <svg class="lnk-arr" width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="1.5"/></svg>
+        </a>
+        <a href="https://t.me/dlais1337" target="_blank" class="lnk">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+          @dlais1337
+          <svg class="lnk-arr" width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="1.5"/></svg>
+        </a>
+        <a href="https://t.me/dlaisch" target="_blank" class="lnk">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+          @dlaisch
+          <svg class="lnk-arr" width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="1.5"/></svg>
+        </a>
+      </div>
 
-                    <!-- Навыки -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <polyline points="16,18 22,12 16,6"></polyline>
-                                <polyline points="8,6 2,12 8,18"></polyline>
-                            </svg>
-                            Навыки
-                        </h3>
-                        <p class="text-xs text-zinc-400 leading-relaxed">
-                            vibe coding, caff.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Средняя колонка -->
-                <div class="space-y-4">
-                    <!-- Проекты (одна кнопка) -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-4 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                <line x1="8" y1="21" x2="16" y2="21"></line>
-                                <line x1="12" y1="17" x2="12" y2="21"></line>
-                            </svg>
-                            Проекты
-                        </h3>
-                        <div class="space-y-3">
-                            <a href="https://t.me/DlaisChannel" target="_blank" class="project-card block glass-card p-3">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-10 h-10 rounded bg-gradient-to-br from-blue-700/20 to-blue-900/10 flex items-center justify-center flex-shrink-0 border border-blue-700/20">
-                                        <svg class="w-5 h-5 blue-icon" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-sm font-semibold mb-0.5 text-zinc-200">шиза длайсика</h4>
-                                        <p class="text-xs text-zinc-600">Telegram</p>
-                                    </div>
-                                    <svg class="w-3.5 h-3.5 text-zinc-600 flex-shrink-0" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="2" />
-                                    </svg>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- О себе -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                            О себе
-                        </h3>
-                        <div class="space-y-3">
-                            <p class="text-xs text-zinc-400 leading-relaxed">
-                              привет, мя зовут никита, играю на мадже год, уже отсидел с чсп 3 месяца, и с чсс феникса 8, пока не играю, тейко уебаны, 02 лав.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Правая колонка (только музыка) -->
-                <div class="space-y-4">
-                    <!-- Музыка -->
-                    <div class="glass-card p-5 fade-in-up">
-                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2 section-title">
-                            <svg class="w-4 h-4 blue-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 18V5l12-2v13"></path>
-                                <circle cx="6" cy="18" r="3"></circle>
-                                <circle cx="18" cy="16" r="3"></circle>
-                            </svg>
-                            Музыка
-                        </h3>
-                        <div class="text-center py-6 text-zinc-400">
-                            <svg class="w-10 h-10 mx-auto mb-2 opacity-30 blue-icon" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path d="M9 18V5l12-2v13"></path>
-                                <circle cx="6" cy="18" r="3"></circle>
-                                <circle cx="18" cy="16" r="3"></circle>
-                            </svg>
-                            <p class="text-xs">madk1d,янг трэппу и борика тыцын дыцын</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="panel">
+        <div class="panel-label">навыки</div>
+        <div class="chips">
+          <span class="chip">vibe coding</span>
+          <span class="chip">caff.</span>
+          <span class="chip">majestic</span>
+          <span class="chip">gta 5 rp</span>
         </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">проекты</div>
+        <a href="https://t.me/dlaisch" target="_blank" class="proj">
+          <div class="proj-icon">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+          </div>
+          <div>
+            <div class="proj-name">/promo dlais</div>
+            <div class="proj-sub">Telegram Channel</div>
+          </div>
+          <svg class="lnk-arr" style="margin-left:auto" width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-width="1.5"/></svg>
+        </a>
+      </div>
+
     </div>
 
-    <!-- ========== ЭФФЕКТ КРУГА ЗА МЫШКОЙ (ФИНАЛЬНАЯ ВЕРСИЯ) ========== -->
-    <style>
-        canvas.cursor-effect {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-    </style>
-    <canvas class="cursor-effect" id="cursorCanvas"></canvas>
-    <script>
-        (function() {
-            const canvas = document.getElementById('cursorCanvas');
-            const ctx = canvas.getContext('2d');
+    <div class="col-right">
 
-            let bigX = 0, bigY = 0;      // позиция большого круга (с отставанием)
-            let smallX = 0, smallY = 0;   // позиция маленького круга (точно под мышкой)
-            let targetX = 0, targetY = 0;
+      <div class="panel" style="flex:1; min-height:200px;">
+        <div class="panel-label">о себе</div>
+        <p class="about-text">
+          привет, мя зовут никита. играю на мадже год, уже отсидел с чсп 3 месяца, и с чсс феникса 8. пока не играю, тейко уебаны, 02 лав.
+        </p>
+      </div>
 
-            let scale = 1;                // текущий масштаб (1 - обычный)
-            let targetScale = 1;          // целевой масштаб (1 или 1.8 при наведении)
+      <div class="panel" style="padding-top:28px; padding-bottom:28px;">
+        <div class="panel-label">основное</div>
+        <div class="info-row"><span class="ik">сейчас</span><span class="iv">detroit</span></div>
+        <div class="info-row"><span class="ik">timezone</span><span class="iv">UTC+5 / +2 к мск</span></div>
+        <div class="info-row"><span class="ik">язык</span><span class="iv">ru &nbsp;/&nbsp; en (чуть-чуть)</span></div>
+      </div>
 
-            let mouseInside = false;
+    </div>
+  </div>
 
-            // РАЗМЕРЫ И ЦВЕТА
-            const outerRadius = 16;        // большой круг
-            const innerRadius = 4;         // маленький кружок
-            const lineWidth = 1.2;         // обводка
-            const color = '#4aa0ff';       // основной цвет
+</div>
 
-            // ЗАЛИВКА большого круга при наведении
-            const hoverFillAlpha = 0.2;    // прозрачность заливки (0 - нет, 1 - сплошная)
+<div class="player s s4">
+  <div class="pl-track">
+    <div class="pl-title"  id="plTitle">—</div>
+    <div class="pl-artist" id="plArtist">выбери трек</div>
+  </div>
 
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
+  <div class="pl-controls">
+    <button class="pl-btn" id="btnPrev">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+    </button>
+    <button class="pl-btn play" id="btnPlay">
+      <svg id="iPlay"  width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      <svg id="iPause" width="11" height="11" fill="currentColor" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <button class="pl-btn" id="btnNext">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    </button>
+  </div>
 
-            document.addEventListener('mousemove', (e) => {
-                targetX = e.clientX;
-                targetY = e.clientY;
-                mouseInside = true;
-                // маленький круг идёт без задержки
-                smallX = targetX;
-                smallY = targetY;
-            });
+  <div class="pl-progress">
+    <div class="prog-bar" id="progBar">
+      <div class="prog-fill" id="progFill"></div>
+    </div>
+    <div class="prog-times">
+      <span id="tNow">0:00</span>
+      <span id="tTotal">0:00</span>
+    </div>
+  </div>
 
-            document.addEventListener('mouseleave', () => {
-                mouseInside = false;
-            });
+  <div class="pl-tracklist" id="tracklist"></div>
+</div>
 
-            // Определяем, наведена ли мышь на кликабельный элемент
-            function isHoveringElement(e) {
-                const el = document.elementFromPoint(e.clientX, e.clientY);
-                if (!el) return false;
-                return el.closest('a, button, .btn-glass, .project-card, [role="button"]') !== null;
-            }
+<audio id="aud" preload="none"></audio>
+<canvas id="cur"></canvas>
 
-            document.addEventListener('mousemove', (e) => {
-                targetScale = isHoveringElement(e) ? 1.8 : 1;
-            });
+<script>
+const splash = document.getElementById("splash");
+splash.addEventListener("click", () => {
+  splash.classList.add("hide");
+  setTimeout(() => splash.remove(), 900);
+  loadTrack(0, false);
+  aud.play().catch(()=>{});
+}, { once: true });
 
-            function animate() {
-                if (mouseInside) {
-                    // Плавное движение большого круга (отставание)
-                    bigX += (targetX - bigX) * 0.15;
-                    bigY += (targetY - bigY) * 0.15;
-                    // Плавное изменение масштаба
-                    scale += (targetScale - scale) * 0.1;
-                }
+const TRACKS = [
+  { title: "8 миля",         artist: "madk1d",                          file: "madk1d_-_8_milya_80913869.mp3" },
+  { title: "тыцын дыцын",    artist: "BORIK",                            file: "BORIK_-_TYCN-DYCN_79893954.mp3" },
+  { title: "розовое вино 2", artist: "Янг Трэппа ft. MORGENSHTERN",      file: "Yung_Trappa_-_Rozovoe_Vino_2_feat._MORGENSHTERN_(Zvyki.com).mp3" },
+];
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+let cur = 0, playing = false;
+const aud     = document.getElementById('aud');
+const plTitle  = document.getElementById('plTitle');
+const plArtist = document.getElementById('plArtist');
+const iPlay    = document.getElementById('iPlay');
+const iPause   = document.getElementById('iPause');
+const progFill = document.getElementById('progFill');
+const tNow     = document.getElementById('tNow');
+const tTotal   = document.getElementById('tTotal');
+const progBar  = document.getElementById('progBar');
+const tl       = document.getElementById('tracklist');
 
-                if (mouseInside) {
-                    // РИСУЕМ БОЛЬШОЙ КРУГ
-                    ctx.beginPath();
-                    ctx.arc(bigX, bigY, outerRadius * scale, 0, Math.PI * 2);
+function fmt(s) {
+  if (!isFinite(s)) return '0:00';
+  return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+}
 
-                    // Если масштаб больше обычного (наведение), добавляем полупрозрачную заливку
-                    if (scale > 1.05) { // небольшой порог, чтобы заливка появлялась плавно
-                        ctx.fillStyle = `rgba(74, 160, 255, ${hoverFillAlpha})`;
-                        ctx.fill();
-                    }
+TRACKS.forEach((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'pl-tl-item' + (i === 0 ? ' active' : '');
+  el.textContent = t.title;
+  el.addEventListener('click', () => loadTrack(i, true));
+  tl.appendChild(el);
+});
 
-                    // Обводка большого круга (всегда)
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = lineWidth;
-                    ctx.stroke();
+function updateTL() {
+  tl.querySelectorAll('.pl-tl-item').forEach((el, i) => {
+    el.classList.toggle('active', i === cur);
+  });
+}
 
-                    // МАЛЕНЬКИЙ КРУГ (всегда залит)
-                    ctx.beginPath();
-                    ctx.arc(smallX, smallY, innerRadius * scale, 0, Math.PI * 2);
-                    ctx.fillStyle = color;
-                    ctx.fill();
-                }
+function loadTrack(idx, autoplay) {
+  cur = (idx + TRACKS.length) % TRACKS.length;
+  const t = TRACKS[cur];
+  plTitle.textContent  = t.title;
+  plArtist.textContent = t.artist;
+  aud.src = t.file;
+  progFill.style.width = '0%';
+  tNow.textContent = '0:00';
+  tTotal.textContent = '0:00';
+  updateTL();
+  if (autoplay) aud.play().catch(()=>{});
+}
 
-                requestAnimationFrame(animate);
-            }
-            animate();
-        })();
-    </script>
-    <!-- ========== КОНЕЦ ЭФФЕКТА ========== -->
+function setUI(state) {
+  playing = state;
+  iPlay.style.display  = state ? 'none' : '';
+  iPause.style.display = state ? '' : 'none';
+}
+
+aud.addEventListener('play',  () => setUI(true));
+aud.addEventListener('pause', () => setUI(false));
+aud.addEventListener('ended', () => loadTrack(cur + 1, true));
+aud.addEventListener('timeupdate', () => {
+  if (!aud.duration) return;
+  progFill.style.width = (aud.currentTime / aud.duration * 100) + '%';
+  tNow.textContent = fmt(aud.currentTime);
+});
+aud.addEventListener('loadedmetadata', () => { tTotal.textContent = fmt(aud.duration); });
+
+progBar.addEventListener('click', e => {
+  if (!aud.duration) return;
+  const r = progBar.getBoundingClientRect();
+  aud.currentTime = ((e.clientX - r.left) / r.width) * aud.duration;
+});
+
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (aud.paused) aud.play().catch(()=>{});
+  else aud.pause();
+});
+document.getElementById('btnNext').addEventListener('click', () => loadTrack(cur + 1, playing));
+document.getElementById('btnPrev').addEventListener('click', () => loadTrack(cur - 1, playing));
+
+loadTrack(0, false);
+
+/* ── CURSOR ── */
+(function(){
+  const cv = document.getElementById('cur');
+  const cx = cv.getContext('2d');
+  let bx=0,by=0,tx=0,ty=0,sc=1,tsc=1,inside=false,click=false;
+  function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
+  addEventListener('resize',resize); resize();
+  addEventListener('mousemove', e=>{
+    tx=e.clientX; ty=e.clientY; inside=true;
+    const el=document.elementFromPoint(e.clientX,e.clientY);
+    tsc = el&&el.closest('a,button,.chip,.proj,.pl-tl-item') ? 1.55 : 1;
+  });
+  addEventListener('mouseleave',()=>inside=false);
+  addEventListener('mousedown',()=>click=true);
+  addEventListener('mouseup',()=>click=false);
+  function loop(){
+    bx+=(tx-bx)*.11; by+=(ty-by)*.11; sc+=(tsc-sc)*.1;
+    cx.clearRect(0,0,cv.width,cv.height);
+    if(inside){
+      const r=11*sc*(click?.78:1);
+      cx.beginPath(); cx.arc(bx,by,r,0,Math.PI*2);
+      cx.strokeStyle='rgba(240,240,240,0.45)'; cx.lineWidth=1; cx.stroke();
+      cx.beginPath(); cx.arc(tx,ty,2.2*(click?1.4:1),0,Math.PI*2);
+      cx.fillStyle='#efefef'; cx.fill();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
 </body>
-
 </html>
