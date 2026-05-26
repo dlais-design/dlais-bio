@@ -19,7 +19,7 @@
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { cursor:none; }
+html, body, a, button, .chip, .proj, .pl-tl-item, .prog-bar, .splash { cursor: none !important; }
 body {
   font-family: var(--mono);
   background: var(--bg);
@@ -40,14 +40,12 @@ body {
   background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.7) 100%);
 }
 
-/* ── PAGE ── */
 .page {
   max-width: 1020px;
   margin: 0 auto;
   padding: 0 40px 180px;
 }
 
-/* ── HERO ── */
 .hero {
   padding: 80px 0 64px;
   border-bottom: 1px solid var(--border);
@@ -60,7 +58,6 @@ body {
 }
 
 .hero-left { display:flex; align-items:flex-end; gap:28px; }
-
 .avatar-wrap { position:relative; width:96px; height:96px; flex-shrink:0; }
 
 .avatar-img {
@@ -112,7 +109,6 @@ body {
   margin-top: 6px;
 }
 
-/* ── LAYOUT ── */
 .layout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -121,14 +117,12 @@ body {
   margin-top: 0;
 }
 
-/* left column */
 .col-left {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
 
-/* right column */
 .col-right {
   display: flex;
   flex-direction: column;
@@ -141,7 +135,6 @@ body {
 }
 .panel:last-child { border-bottom: none; }
 .col-left .panel { border-bottom: 1px solid var(--border); }
-
 .col-right .panel { border-left: none; }
 
 .panel-label {
@@ -155,7 +148,6 @@ body {
   align-items: center;
   gap: 10px;
 }
-
 .panel-label::after {
   content: '';
   flex: 1;
@@ -163,7 +155,6 @@ body {
   background: var(--border);
 }
 
-/* ── INFO ROWS ── */
 .info-row {
   display: flex;
   justify-content: space-between;
@@ -175,7 +166,6 @@ body {
 .ik { color: var(--t3); }
 .iv { color: var(--t2); font-weight: 300; }
 
-/* ── LINKS ── */
 .lnk {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 0;
@@ -193,7 +183,6 @@ body {
 .lnk-arr { margin-left: auto; opacity: .15 !important; transition: opacity .2s, transform .2s !important; }
 .lnk:hover .lnk-arr { opacity: .5 !important; transform: translate(2px,-2px); }
 
-/* ── SKILLS ── */
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .chip {
   font-size: 9px; letter-spacing: 0.07em;
@@ -204,7 +193,6 @@ body {
 }
 .chip:hover { border-color: var(--border-h); color: var(--t2); }
 
-/* ── ABOUT ── */
 .about-text {
   font-size: 12px;
   color: var(--t2);
@@ -213,7 +201,6 @@ body {
   max-width: 520px;
 }
 
-/* ── PROJECTS ── */
 .proj {
   display: flex; align-items: center; gap: 14px;
   padding: 12px 0;
@@ -238,7 +225,6 @@ body {
 .proj-sub  { font-size: 9px; color: var(--t3); margin-top: 1px; letter-spacing: .06em; }
 .proj:hover .proj-name { color: var(--t1); }
 
-/* ── BIG TEXT PANEL ── */
 .big-panel {
   padding: 40px 28px;
   border-bottom: 1px solid var(--border);
@@ -266,7 +252,6 @@ body {
 }
 .stat:last-child { border-right: none; }
 
-/* ── STAGGER ── */
 .s { opacity: 0; animation: up .7s cubic-bezier(.16,1,.3,1) forwards; }
 .s1 { animation-delay: .15s; }
 .s2 { animation-delay: .25s; }
@@ -278,7 +263,6 @@ body {
   to   { opacity:1; transform: translateY(0); }
 }
 
-/* ── PLAYER ── */
 .player {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 210;
   height: 62px;
@@ -296,7 +280,7 @@ body {
 .pl-controls { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
 .pl-btn {
   background: none; border: none; color: var(--t3);
-  cursor: none; padding: 4px;
+  padding: 4px;
   display: flex; align-items: center;
   transition: color .2s;
 }
@@ -315,7 +299,7 @@ body {
 .prog-bar {
   width: 100%; height: 1px;
   background: var(--border);
-  position: relative; cursor: none;
+  position: relative;
 }
 .prog-fill { height: 100%; background: var(--t3); width: 0%; transition: background .2s; }
 .prog-bar:hover .prog-fill { background: var(--t2); }
@@ -331,7 +315,6 @@ body {
   color: var(--t3);
   letter-spacing: .06em;
   border-right: 1px solid var(--border);
-  cursor: none;
   transition: all .2s;
   white-space: nowrap;
   max-width: 100px;
@@ -342,13 +325,11 @@ body {
 .pl-tl-item:hover { color: var(--t2); background: var(--surface); }
 .pl-tl-item.active { color: var(--t2); background: var(--surface); }
 
-/* ── SPLASH ── */
 .splash {
   position: fixed; inset: 0; z-index: 1000;
   background: var(--bg);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  cursor: none;
   transition: opacity .8s ease;
 }
 .splash.hide { opacity: 0; pointer-events: none; }
@@ -370,8 +351,10 @@ body {
 }
 @keyframes blink { 0%,100%{opacity:.3} 50%{opacity:.8} }
 
-/* ── CURSOR ── */
-#cur { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
+#cur { 
+  position: fixed; inset: 0; width: 100%; height: 100%; 
+  pointer-events: none; z-index: 9999; 
+}
 
 @media (max-width: 700px) {
   .layout { grid-template-columns: 1fr; }
@@ -544,8 +527,8 @@ splash.addEventListener("click", () => {
 }, { once: true });
 
 const TRACKS = [
-  { title: "8 миля",         artist: "madk1d",                          file: "madk1d_-_8_milya_80913869.mp3" },
-  { title: "тыцын дыцын",    artist: "BORIK",                            file: "BORIK_-_TYCN-DYCN_79893954.mp3" },
+  { title: "8 миля",         artist: "madk1d",                      file: "madk1d_-_8_milya_80913869.mp3" },
+  { title: "тыцын дыцын",    artist: "BORIK",                       file: "BORIK_-_TYCN-DYCN_79893954.mp3" },
   { title: "розовое вино 2", artist: "Янг Трэппа ft. MORGENSHTERN",      file: "Yung_Trappa_-_Rozovoe_Vino_2_feat._MORGENSHTERN_(Zvyki.com).mp3" },
 ];
 
@@ -612,7 +595,8 @@ aud.addEventListener('loadedmetadata', () => { tTotal.textContent = fmt(aud.dura
 progBar.addEventListener('click', e => {
   if (!aud.duration) return;
   const r = progBar.getBoundingClientRect();
-  aud.currentTime = ((e.clientX - r.left) / r.width) * aud.duration;
+  const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+  aud.currentTime = ((clientX - r.left) / r.width) * aud.duration;
 });
 
 document.getElementById('btnPlay').addEventListener('click', () => {
@@ -624,30 +608,62 @@ document.getElementById('btnPrev').addEventListener('click', () => loadTrack(cur
 
 loadTrack(0, false);
 
-/* ── CURSOR ── */
 (function(){
   const cv = document.getElementById('cur');
   const cx = cv.getContext('2d');
   let bx=0,by=0,tx=0,ty=0,sc=1,tsc=1,inside=false,click=false;
-  function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
-  addEventListener('resize',resize); resize();
-  addEventListener('mousemove', e=>{
-    tx=e.clientX; ty=e.clientY; inside=true;
-    const el=document.elementFromPoint(e.clientX,e.clientY);
-    tsc = el&&el.closest('a,button,.chip,.proj,.pl-tl-item') ? 1.55 : 1;
+  let dpr = window.devicePixelRatio || 1;
+
+  function resize(){ 
+    dpr = window.devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; 
+    cv.height = innerHeight * dpr; 
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener('resize', resize); 
+  resize();
+
+  function move(x, y) {
+    tx = x; ty = y; inside = true;
+    const el = document.elementFromPoint(x, y);
+    tsc = el && el.closest('a,button,.chip,.proj,.pl-tl-item,#btnPlay,#btnNext,#btnPrev') ? 1.55 : 1;
+  }
+
+  addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  addEventListener('mouseleave', () => inside = false);
+  addEventListener('mousedown', () => click = true);
+  addEventListener('mouseup', () => click = false);
+
+  addEventListener('touchstart', e => {
+    click = true;
+    if(e.touches.length > 0) move(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passthrough: true});
+
+  addEventListener('touchmove', e => {
+    if(e.touches.length > 0) move(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passthrough: true});
+
+  addEventListener('touchend', () => {
+    click = false;
+    inside = false;
   });
-  addEventListener('mouseleave',()=>inside=false);
-  addEventListener('mousedown',()=>click=true);
-  addEventListener('mouseup',()=>click=false);
+
   function loop(){
-    bx+=(tx-bx)*.11; by+=(ty-by)*.11; sc+=(tsc-sc)*.1;
-    cx.clearRect(0,0,cv.width,cv.height);
+    bx += (tx - bx) * .11; 
+    by += (ty - by) * .11; 
+    sc += (tsc - sc) * .1;
+    cx.clearRect(0, 0, cv.width / dpr, cv.height / dpr);
     if(inside){
-      const r=11*sc*(click?.78:1);
-      cx.beginPath(); cx.arc(bx,by,r,0,Math.PI*2);
-      cx.strokeStyle='rgba(240,240,240,0.45)'; cx.lineWidth=1; cx.stroke();
-      cx.beginPath(); cx.arc(tx,ty,2.2*(click?1.4:1),0,Math.PI*2);
-      cx.fillStyle='#efefef'; cx.fill();
+      const r = 11 * sc * (click ? .78 : 1);
+      cx.beginPath(); 
+      cx.arc(bx, by, r, 0, Math.PI * 2);
+      cx.strokeStyle = 'rgba(240,240,240,0.45)'; 
+      cx.lineWidth = 1; 
+      cx.stroke();
+      cx.beginPath(); 
+      cx.arc(tx, ty, 2.2 * (click ? 1.4 : 1), 0, Math.PI * 2);
+      cx.fillStyle = '#efefef'; 
+      cx.fill();
     }
     requestAnimationFrame(loop);
   }
